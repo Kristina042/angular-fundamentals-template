@@ -54,7 +54,6 @@ export class AppComponent implements OnInit, OnDestroy {
         switchMap((searchItem) => this.mockDataService.getCharacters(searchItem))
         // YOUR CODE ENDS HERE
         );
-      
   }
 
   loadCharactersAndPlanet(): void {
@@ -77,15 +76,20 @@ export class AppComponent implements OnInit, OnDestroy {
     - Subscribe to changes
     - Check the received value using the areAllValuesTrue function and pass them to the isLoading variable. */
     // YOUR CODE STARTS HERE
+    this.subscriptions.push(
     combineLatest([this.mockDataService.getCharactersLoader(), this.mockDataService.getPlanetLoader()])
-    .subscribe((arr) => this.isLoading = this.areAllValuesTrue(arr))
+    .subscribe((arr) => {
+      this.isLoading = this.areAllValuesTrue(arr)
+    }))
+
+    console.log(this.subscriptions)
     // YOUR CODE ENDS HERE
   }
 
   ngOnDestroy(): void {
     // 5.2 Unsubscribe from all subscriptions
     // YOUR CODE STARTS HERE
-    this.searchTermByCharacters.unsubscribe()
+    this.subscriptions.forEach(sub => sub.unsubscribe)
     // YOUR CODE ENDS HERE
   }
 

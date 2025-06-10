@@ -50,10 +50,10 @@ export class AppComponent implements OnInit, OnDestroy {
         .pipe(
         // YOUR CODE STARTS HERE
         debounceTime(500),
-        filter(searchItem => searchItem.length > 2),
+        filter(searchItem => searchItem.length >= 3),
         switchMap((searchItem) => this.mockDataService.getCharacters(searchItem))
         // YOUR CODE ENDS HERE
-        );
+        )
   }
 
   loadCharactersAndPlanet(): void {
@@ -63,9 +63,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.planetAndCharactersResults$ = forkJoin([
       this.mockDataService.getCharacters(),
       this.mockDataService.getPlanets()
-    ]).pipe(
-      map(arr => {return [...arr[0], ...arr[1]]})
-    );
+    ]).pipe(map(payloads => payloads.flat()))
     // YOUR CODE ENDS HERE
   }
 
@@ -76,11 +74,16 @@ export class AppComponent implements OnInit, OnDestroy {
     - Subscribe to changes
     - Check the received value using the areAllValuesTrue function and pass them to the isLoading variable. */
     // YOUR CODE STARTS HERE
-    this.subscriptions.push(
-    combineLatest([this.mockDataService.getCharactersLoader(), this.mockDataService.getPlanetLoader()])
-    .subscribe((arr) => {
-      this.isLoading = this.areAllValuesTrue(arr)
-    }))
+
+    const subscription = combineLatest([
+      this.mockDataService.getCharactersLoader(),
+      this.mockDataService.getPlanetLoader()
+    ])
+    .subscribe((loadStateArr) => {
+      this.isLoading = this.areAllValuesTrue(loadStateArr)
+    })
+
+    this.subscriptions.push(subscription)
     // YOUR CODE ENDS HERE
   }
 
